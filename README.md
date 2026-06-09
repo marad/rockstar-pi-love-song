@@ -63,24 +63,24 @@ It computes π. It also breaks your heart a little.
 The quickest way is the official playground - paste
 [`love-pi.rock`](./love-pi.rock) into <https://codewithrockstar.com/online> and run it.
 
-This repo also includes a small Node setup (`rockstar-pi/`) that runs the program
-through [`rockstar-strudel`](https://www.npmjs.com/package/rockstar-strudel), a
-WASM-based Rockstar engine - fittingly, one that can also emit its output as musical
-notes:
-
-```js
-const { init, rockstar_pro } = await import('https://esm.sh/rockstar-strudel')
-await init()
-
-const src = await fetch('./love-pi.rock').then(r => r.text())
-const prog = await rockstar_pro([src])
-console.log(prog.text_output) // the π approximation
-```
+This repo also ships a tiny browser demo in [`rockstar-pi/`](./rockstar-pi) that runs
+the program live and shows the π it sings:
 
 ```bash
 cd rockstar-pi
-npm install
+npm start          # serves the repo on http://localhost:3000
 ```
+
+Then open <http://localhost:3000/rockstar-pi/>. It prints `3.14108` - a real Monte
+Carlo estimate, computed by the ballad. Rockstar has no random-number primitive, so
+the "randomness" is a deterministic pseudo-random recurrence built from arithmetic -
+which means the estimate is reproducible: same lyrics, same π, every run.
+
+Under the hood the demo uses [`rockstar-strudel`](https://www.npmjs.com/package/rockstar-strudel),
+a WASM-based Rockstar engine - fittingly, one built for the [strudel.cc](https://strudel.cc/)
+live-coding REPL, so it can also emit its output as musical notes. Note that it's a
+*browser* engine (it loads .NET WASM from a CDN and needs `window`), so it doesn't run
+under plain Node - hence the little static server above.
 
 (There are several Rockstar implementations - see the
 [Rockstar site](https://codewithrockstar.com/) for the full list.)

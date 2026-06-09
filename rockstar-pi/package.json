@@ -1,15 +1,14 @@
 {
   "name": "rockstar-pi",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Browser demo that runs love-pi.rock and shows the π it sings",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx -y serve .. -l 3000"
   },
-  "keywords": [],
+  "keywords": ["rockstar", "pi", "monte-carlo", "esolang"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "rockstar-strudel": "^1.0.11"
   }

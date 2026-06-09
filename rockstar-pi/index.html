@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>love-pi - running a power ballad</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0; min-height: 100vh;
+      display: grid; place-items: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: #15101c; color: #e7dcef;
+    }
+    main { width: min(760px, 92vw); padding: 2rem 0; }
+    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+    p.sub { margin: 0 0 1.5rem; color: #a394b5; }
+    .result {
+      font-size: 2.6rem; font-weight: 700; letter-spacing: .02em;
+      padding: 1.2rem 1.4rem; border-radius: 14px;
+      background: #211830; border: 1px solid #3a2c50; min-height: 1.4em;
+    }
+    .result.error { color: #ff9a9a; font-size: 1.1rem; font-weight: 400; }
+    .label { color: #a394b5; font-size: .85rem; margin: 1.6rem 0 .4rem; }
+    pre {
+      margin: 0; padding: 1rem 1.2rem; border-radius: 12px;
+      background: #1b1326; border: 1px solid #2e2240;
+      white-space: pre-wrap; line-height: 1.5; color: #c9bcd9; font-size: .82rem;
+      max-height: 40vh; overflow: auto;
+    }
+    a { color: #c79bff; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🥧 love-pi</h1>
+    <p class="sub">A Monte Carlo estimate of π — written as a Rockstar power ballad, run live in your browser.</p>
+
+    <div class="label">π, sung by the machine:</div>
+    <div id="result" class="result">running…</div>
+
+    <div class="label">The source (it's also the lyrics):</div>
+    <pre id="source">loading love-pi.rock…</pre>
+
+    <p class="sub" style="margin-top:1.5rem">
+      🎵 <a href="https://suno.com/song/614c53c6-83f0-4d41-8087-f8eedc26ccfe?sh=HQ6IOMLd3cPc1lrR" target="_blank" rel="noopener">Hear the actual song on Suno</a>
+    </p>
+  </main>
+
+  <script type="module">
+    const resultEl = document.getElementById('result');
+    const sourceEl = document.getElementById('source');
+
+    function fail(msg) {
+      resultEl.classList.add('error');
+      resultEl.textContent = msg;
+    }
+
+    try {
+      // The .rock file is the single source of truth; this page just runs it.
+      const src = await fetch('../love-pi.rock').then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.text();
+      });
+      sourceEl.textContent = src;
+
+      // rockstar-strudel is a browser/WASM engine — the same one behind the
+      // strudel.cc REPL. It can't run under plain Node, so this demo lives here.
+      const { init, rockstar_pro } = await import('https://esm.sh/rockstar-strudel');
+      await init();
+
+      const prog = await rockstar_pro([src]);
+
+      if (prog.error) {
+        fail('Rockstar error: ' + JSON.stringify(prog.error));
+      } else {
+        const out = (prog.text_output ?? prog.output ?? []).join(' ').trim();
+        resultEl.textContent = out || '(the song printed nothing)';
+      }
+    } catch (e) {
+      fail(
+        'Could not run: ' + e.message +
+        '\n\nOpen this page over HTTP (the fetch needs a server):\n  cd rockstar-pi && npm start'
+      );
+      console.error(e);
+    }
+  </script>
+</body>
+</html>
